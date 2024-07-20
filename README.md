@@ -67,3 +67,17 @@
   - Health monitoring of containers
 
   - Securing the interactions between containers.
+
+- Kubernetes is a tool designed to do Container Orchestration and it does its job very well when correctly configured.
+
+- As mentioned earlier, there are other alternatives to Docker Compose. But, throughout the entire PBL program, we will not focus on **Docker Swarm**. We will rather spend more time with **Kubernetes**. Part of the reason for this is because Kubernetes has more functionalities and is widely in use in the industry.
+
+- To know when to choose between  Docker Swarm and Kubernetes, [Here is an interesting article to read](https://dzone.com/articles/quotdocker-swarm-or-kubernetesquot-is-it-the-right) with some very enlightening stats.
+
+**Kubernetes architecture**
+
+- Kubernetes is a not a single package application that you can install with one command, it is comprised of several components, some of them can be deployed as services, some can be also deployed as separate containers.
+
+- Let us take a look at Kubernetes architecture diagram below:
+
+![alt text](<Kubernetes architecture 2.PNG>) ![alt text](<kubernetes architecture 1.PNG>)
