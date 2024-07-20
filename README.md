@@ -182,7 +182,8 @@ sudo apt install jq -y
 
 - Test your AWS CLI by running:
 
-`aws ec2 describe-vpcs`
+`aws ec2 describe-vpcs` and check if you can see VPC details.
 
 ![alt text](<2 aws config and aws ec2 describe-vpc.png>)
+
 
