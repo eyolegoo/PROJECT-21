@@ -45,3 +45,25 @@
 2. - To ensure that container workloads are highly scalable, they must be configured to run across multiple compute nodes. A compute node can be a physical server or a virtual machine with Docker engine installed to run your containers.
 
 - If we had two compute nodes to run our containers, let us consider a following scenarios:
+
+1. - Given the two points mentioned above, if containers are configured to run across 2 computer nodes, and a particular container, running on Node 1 dies, how will it know that it can spin up again on Node 2?
+
+2. - Let us imagine that Tooling website container is running on Node 1, and MySQL container is running on Node 2, how will both containers be able to communicate with each other? Remember in Project 20, we had to create a custom network on the same host and ensure that they can communicate through that network. But in the case of 2 separate hosts, this is natively not possible.
+
+**Container orchestration** is a concept that allows to address these two scenarios, it provides automation of all the aspects of coordinating and managing containers. Container orchestration is focused on managing life cycle of containers and their dynamic environments.
+
+- It is about automating the entire lifecycle of containers running across multiple nodes:
+
+  - Configuring and scheduling of containers on nodes
+
+  - Ensuring the availability of containers, even when they die
+
+  - Scaling of containers to equally balance application workloads across infrastructure
+
+  - Allocation of resources between containers
+
+  - Load balancing, traffic routing and service discovery of containers
+
+  - Health monitoring of containers
+
+  - Securing the interactions between containers.
