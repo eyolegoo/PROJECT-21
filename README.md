@@ -81,3 +81,7 @@
 - Let us take a look at Kubernetes architecture diagram below:
 
 ![alt text](<Kubernetes architecture 2.PNG>) ![alt text](<kubernetes architecture 1.PNG>)
+
+
+- Read about every component in the [official documentation](https://kubernetes.io/docs/concepts/overview/components/).
+Make sure you understand the role of each component on the diagram above, without this understanding it will be extremely difficult for you to install and operate a K8s cluster, especially when it comes to troubleshooting and maintenance.
