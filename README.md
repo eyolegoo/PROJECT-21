@@ -168,3 +168,21 @@ sudo apt update
 sudo apt install awscli -y
 sudo apt install jq -y
 ```
+
+![alt text](<1 apt update and awscli installed.png>)
+
+
+- Configure AWS CLI to access all AWS services used, for this you need to have a user with programmatic access keys configured in AWS Identity and Access Management (IAM).
+
+- Generate access keys and store them in a safe place.
+
+- To configure your AWS CLI – run your shell (or cmd if using Windows) and run:
+
+`aws configure`
+
+- Test your AWS CLI by running:
+
+`aws ec2 describe-vpcs`
+
+![alt text](<2 aws config and aws ec2 describe-vpc.png>)
+
