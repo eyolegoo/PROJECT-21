@@ -105,9 +105,9 @@ Make sure you understand the role of each component on the diagram above, withou
 
 2. - Apply security settings across the entire cluster (i.e., encrypting the data in transit, and at rest)
 
-  - In transit encryption means encrypting communications over the network using HTTPS
+    - In transit encryption means encrypting communications over the network using HTTPS
 
-  - At rest encryption means encrypting the data stored on a disk
+    - At rest encryption means encrypting the data stored on a disk
 
 3. - Plan the capacity for the backend data store etcd
 
@@ -134,4 +134,3 @@ Make sure you understand the role of each component on the diagram above, withou
   - cfssl and cfssljson utilities
   - Kubernetes cluster
 
-  
