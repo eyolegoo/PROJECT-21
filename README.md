@@ -101,9 +101,9 @@ Make sure you understand the role of each component on the diagram above, withou
 
 - To successfully implement "K8s From-Ground-Up", the following and even more will be done by you as a K8s administrator:
 
-1. - Install and configure [master (also known as control plane) components](https://kubernetes.io/docs/concepts/overview/components/#control-plane-components) and [worker nodes (or just nodes)](https://kubernetes.io/docs/concepts/architecture/nodes/).
+1. -Install and configure [master (also known as control plane) components](https://kubernetes.io/docs/concepts/overview/components/#control-plane-components) and [worker nodes (or just nodes)](https://kubernetes.io/docs/concepts/architecture/nodes/).
 
-2. - Apply security settings across the entire cluster (i.e., encrypting the data in transit, and at rest)
+2. -Apply security settings across the entire cluster (i.e., encrypting the data in transit, and at rest)
 
     - In transit encryption means encrypting communications over the network using HTTPS
 
