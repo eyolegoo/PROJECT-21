@@ -91,7 +91,7 @@ Make sure you understand the role of each component on the diagram above, withou
 
 **"Kubernetes From-Ground-Up"**
 
-***K8s installation options***
+- ***K8s installation options***
 
 - So far, Kubernetes sounds like a lot of fun, right? With its intuitive architecture, and rich configuration options, you may already want to jump right in, spin up a few VMs and begin to install and configure a Kubernetes cluster. But hold on for a second. Installing and configuring Kubernetes is far from being a walk in the park, i.e., it is very difficult to implement and get it ready for production. Especially, if you want to setup a highly available, and secure Kubernetes cluster.
 
@@ -134,3 +134,37 @@ Make sure you understand the role of each component on the diagram above, withou
   - cfssl and cfssljson utilities
   - Kubernetes cluster
 
+- You will create 6 EC2 Instances, and in the end, we will have the following parts of the cluster properly configured:
+
+  - Three Kubernetes Master
+  - Three Kubernetes Worker Nodes
+  - Configured SSL/TLS certificates for Kubernetes components to communicate securely
+  - Configured Node Network
+  - Configured Pod Network
+
+
+**Step 0 Install client tools before bootstrapping the cluster.**
+
+- First, you will need some client tools installed and configurations made on your client workstation:
+
+  - [awscli](https://aws.amazon.com/cli/) - is a unified tool to manage your AWS services
+
+  - [kubectl](https://kubernetes.io/docs/reference/kubectl/) - this command line utility will be your main control tool to manage your K8s cluster. You will use this tool so many times, so you will be able to type 'kubetcl' on your keyboard with a speed of light. You can always make a shortcut (alias) to just one character 'k'. Also, add this extremely useful official kubectl Cheat Sheet to your bookmarks, it has examples of the most used 'kubectl' commands.
+
+  - [cfssl](https://blog.cloudflare.com/introducing-cfssl/) - an open source toolkit for everything TLS/SSL from [Cloudflare](https://www.cloudflare.com/)
+
+
+  - [cfssljson](https://github.com/cloudflare/cfssl) - a program, which takes the JSON output from the cfssl and writes certificates, keys, [CSRs](https://en.wikipedia.org/wiki/Certificate_signing_request), and bundles to disk.
+
+
+**Install and configure AWS CLI**
+
+- On your local workstation (wsl ubuntu 20.04) download and install the latest version of AWS CLI
+
+- To install awscli on your ubuntu local system:
+
+```
+sudo apt update
+sudo apt install awscli -y
+sudo apt install jq -y
+```
