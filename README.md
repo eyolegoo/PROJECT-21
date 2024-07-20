@@ -40,15 +40,15 @@
 
 - Two important things to remember about Docker containers are:
 
-1. - Unlike virtual machines, they are not designed to run for a very long time. By design, Docker containers are ephemeral. By “ephemeral” it means that a container can be stopped and destroyed, and a new one can be built from the same Docker image and put in place with an absolute minimum set-up and configuration requirement.
+1. Unlike virtual machines, they are not designed to run for a very long time. By design, Docker containers are ephemeral. By “ephemeral” it means that a container can be stopped and destroyed, and a new one can be built from the same Docker image and put in place with an absolute minimum set-up and configuration requirement.
 
-2. - To ensure that container workloads are highly scalable, they must be configured to run across multiple compute nodes. A compute node can be a physical server or a virtual machine with Docker engine installed to run your containers.
+2. To ensure that container workloads are highly scalable, they must be configured to run across multiple compute nodes. A compute node can be a physical server or a virtual machine with Docker engine installed to run your containers.
 
 - If we had two compute nodes to run our containers, let us consider a following scenarios:
 
-1. - Given the two points mentioned above, if containers are configured to run across 2 computer nodes, and a particular container, running on Node 1 dies, how will it know that it can spin up again on Node 2?
+1. Given the two points mentioned above, if containers are configured to run across 2 computer nodes, and a particular container, running on Node 1 dies, how will it know that it can spin up again on Node 2?
 
-2. - Let us imagine that Tooling website container is running on Node 1, and MySQL container is running on Node 2, how will both containers be able to communicate with each other? Remember in Project 20, we had to create a custom network on the same host and ensure that they can communicate through that network. But in the case of 2 separate hosts, this is natively not possible.
+2. Let us imagine that Tooling website container is running on Node 1, and MySQL container is running on Node 2, how will both containers be able to communicate with each other? Remember in Project 20, we had to create a custom network on the same host and ensure that they can communicate through that network. But in the case of 2 separate hosts, this is natively not possible.
 
 **Container orchestration** is a concept that allows to address these two scenarios, it provides automation of all the aspects of coordinating and managing containers. Container orchestration is focused on managing life cycle of containers and their dynamic environments.
 
@@ -101,21 +101,21 @@ Make sure you understand the role of each component on the diagram above, withou
 
 - To successfully implement "K8s From-Ground-Up", the following and even more will be done by you as a K8s administrator:
 
-1. -Install and configure [master (also known as control plane) components](https://kubernetes.io/docs/concepts/overview/components/#control-plane-components) and [worker nodes (or just nodes)](https://kubernetes.io/docs/concepts/architecture/nodes/).
+1. Install and configure [master (also known as control plane) components](https://kubernetes.io/docs/concepts/overview/components/#control-plane-components) and [worker nodes (or just nodes)](https://kubernetes.io/docs/concepts/architecture/nodes/).
 
-2. -Apply security settings across the entire cluster (i.e., encrypting the data in transit, and at rest)
+2. Apply security settings across the entire cluster (i.e., encrypting the data in transit, and at rest)
 
     - In transit encryption means encrypting communications over the network using HTTPS
 
     - At rest encryption means encrypting the data stored on a disk
 
-3. - Plan the capacity for the backend data store etcd
+3. Plan the capacity for the backend data store etcd
 
-4. - Configure network plugins for the containers to communicate
+4. Configure network plugins for the containers to communicate
 
-5. - Manage periodical upgrade of the cluster
+5. Manage periodical upgrade of the cluster
 
-6. - Configure observability and auditing
+6. Configure observability and auditing
 
 **Note**: Unless you have any business or compliance restrictions, **ALWAYS** consider to use managed versions of K8s - Platform as a Service offerings, such as [Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/), [Amazon Elastic Kubernetes Service (Amazon EKS)](https://aws.amazon.com/eks/), or [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) as they usually have better default security settings, and the costs for maintaining the control plane are very low.
 
