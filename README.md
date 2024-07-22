@@ -264,6 +264,8 @@ $ sudo mv cfssljson_1.6.5_linux_amd64 /usr/local/bin/cfssljson
 cfssl version
 ```
 
+- Output
+
 ```
 Version: 1.2.0
 Revision: dev
@@ -273,6 +275,8 @@ Runtime: go1.6
 ```
 cfssljson --version
 ```
+
+- Output 
 
 ```
 Version: 1.4.1
