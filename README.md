@@ -346,6 +346,7 @@ aws ec2 modify-vpc-attribute \
 --enable-dns-hostnames '{"Value": true}'
 ```
 
+
 **AWS Region**
 
 6. Set the required region
@@ -353,6 +354,7 @@ aws ec2 modify-vpc-attribute \
 ```
 AWS_REGION=us-east-1
 ```
+
 
 **Dynamic Host Configuration Protocol – DHCP**
 
@@ -389,6 +391,7 @@ aws ec2 associate-dhcp-options \
 ```  
 
 ![alt text](<5b DHCP SET.png>)
+
 
 **Subnet**
 
@@ -430,6 +433,7 @@ aws ec2 attach-internet-gateway \
 
 ![alt text](<5d internet gateway.png>)
 
+
 **Route tables**
 
 12. Create route tables, associate the route table to subnet, and create a route to allow external traffic to the Internet through the Internet Gateway:
@@ -466,3 +470,59 @@ aws ec2 create-route \
 
 ![alt text](<6 Route table-1.png>)
 ![alt text](<6a Route table-1.png>)
+
+
+**SECURITY GROUPS**
+
+13. Configure security groups
+
+```
+# Create the security group and store its ID in a variable
+SECURITY_GROUP_ID=$(aws ec2 create-security-group \
+  --group-name ${NAME} \
+  --description "Kubernetes cluster security group" \
+  --vpc-id ${VPC_ID} \
+  --output text --query 'GroupId')
+
+# Create the NAME tag for the security group
+aws ec2 create-tags \
+  --resources ${SECURITY_GROUP_ID} \
+  --tags Key=Name,Value=${NAME}
+
+# Create Inbound traffic for all communication within the subnet to connect on ports used by the master node(s)
+aws ec2 authorize-security-group-ingress \
+    --group-id ${SECURITY_GROUP_ID} \
+    --ip-permissions IpProtocol=tcp,FromPort=2379,ToPort=2380,IpRanges='[{CidrIp=172.31.0.0/24}]'
+
+# Create Inbound traffic for all communication within the subnet to connect on ports used by the worker nodes
+aws ec2 authorize-security-group-ingress \
+    --group-id ${SECURITY_GROUP_ID} \
+    --ip-permissions IpProtocol=tcp,FromPort=30000,ToPort=32767,IpRanges='[{CidrIp=172.31.0.0/24}]'
+
+# Create inbound traffic to allow connections to the Kubernetes API Server listening on port 6443
+aws ec2 authorize-security-group-ingress \
+  --group-id ${SECURITY_GROUP_ID} \
+  --protocol tcp \
+  --port 6443 \
+  --cidr 0.0.0.0/0
+
+# Create Inbound traffic for SSH from anywhere (Do not do this in production. Limit access ONLY to IPs or CIDR that MUST connect)
+aws ec2 authorize-security-group-ingress \
+  --group-id ${SECURITY_GROUP_ID} \
+  --protocol tcp \
+  --port 22 \
+  --cidr 0.0.0.0/0
+
+# Create ICMP ingress for all types
+aws ec2 authorize-security-group-ingress \
+  --group-id ${SECURITY_GROUP_ID} \
+  --protocol icmp \
+  --port -1 \
+  --cidr 0.0.0.0/0
+```
+
+![alt text](<7 Security group.png>)
+
+![alt text](<7a security group output.png>)
+
+![alt text](<7b security group output.png>)
