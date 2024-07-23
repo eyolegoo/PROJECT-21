@@ -526,3 +526,71 @@ aws ec2 authorize-security-group-ingress \
 ![alt text](<7a security group output.png>)
 
 ![alt text](<7b security group output.png>)
+
+
+**Network Load Balancer**
+
+14. Create a network Load balancer
+
+```
+LOAD_BALANCER_ARN=$(aws elbv2 create-load-balancer \
+--name ${NAME} \
+--subnets ${SUBNET_ID} \
+--scheme internet-facing \
+--type network \
+--output text --query 'LoadBalancers[].LoadBalancerArn')
+```
+
+**Tagret Group**
+
+15. Create a target group: (For now it will be unhealthy because there are no real targets yet.)
+
+```
+TARGET_GROUP_ARN=$(aws elbv2 create-target-group \
+  --name ${NAME} \
+  --protocol TCP \
+  --port 6443 \
+  --vpc-id ${VPC_ID} \
+  --target-type ip \
+  --output text --query 'TargetGroups[].TargetGroupArn')
+```
+
+16. Register targets: (Just like above, no real targets. You will just put the IP addresses so that, when the nodes become available, they will be used as targets.)
+
+```
+aws elbv2 register-targets \
+  --target-group-arn ${TARGET_GROUP_ARN} \
+  --targets Id=172.31.0.1{0,1,2}
+```
+
+17. Create a listener to listen for requests and forward to the target nodes on TCP port 6443
+
+```
+aws elbv2 create-listener \
+--load-balancer-arn ${LOAD_BALANCER_ARN} \
+--protocol TCP \
+--port 6443 \
+--default-actions Type=forward,TargetGroupArn=${TARGET_GROUP_ARN} \
+--output text --query 'Listeners[].ListenerArn'
+```
+
+**K8s Public Address**
+
+18. Get the Kubernetes Public address
+
+```
+KUBERNETES_PUBLIC_ADDRESS=$(aws elbv2 describe-load-balancers \
+--load-balancer-arns ${LOAD_BALANCER_ARN} \
+--output text --query 'LoadBalancers[].DNSName')
+```
+
+![alt text](<8 LoadBalancer TargetGroup KubernetesPublicAddress.png>)
+
+![alt text](<8a LB.png>)
+
+![alt text](<8b LB.png>)
+
+![alt text](<8c Target group.png>)
+
+![alt text](<8d Target group.png>)
+
