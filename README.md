@@ -704,3 +704,99 @@ done
 - Here, you will provision a CA that will be used to sign additional TLS certificates.
 
 - Create a directory and **cd** into it:
+
+```
+mkdir ca-authority && cd ca-authority
+```
+
+- Generate the CA configuration file, Root Certificate, and Private key:
+
+```
+{
+
+cat > ca-config.json <<EOF
+{
+  "signing": {
+    "default": {
+      "expiry": "8760h"
+    },
+    "profiles": {
+      "kubernetes": {
+        "usages": ["signing", "key encipherment", "server auth", "client auth"],
+        "expiry": "8760h"
+      }
+    }
+  }
+}
+EOF
+
+cat > ca-csr.json <<EOF
+{
+  "CN": "Kubernetes",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "Kubernetes",
+      "OU": "lego-project",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+}
+```
+
+- Output
+
+```
+2021/05/16 20:18:44 [INFO] generating a new CA key and certificate from CSR
+2021/05/16 20:18:44 [INFO] generate received request
+2021/05/16 20:18:44 [INFO] received CSR
+2021/05/16 20:18:44 [INFO] generating key: rsa-2048
+2021/05/16 20:18:44 [INFO] encoded CSR
+2021/05/16 20:18:44 [INFO] signed certificate with serial number 478642753175858256977534824638605235819766817855
+```
+
+![alt text](<10 Self-Signed Root Certificate Authority (CA).png>)
+
+
+- The file defines the following:
+
+```
+CN – Common name for the authority
+
+algo – the algorithm used for the certificates
+
+size – algorithm size in bits
+
+C – Country
+
+L – Locality (city)
+
+ST – State or province
+
+O – Organization
+
+OU – Organizational Unit
+```
+
+- List the directory to see the created files using `ls -ltr`
+
+![alt text](<10a CA created file.png>)
+
+
+**The 3 important files here are:**
+
+  - **ca.pem** – The Root Certificate
+  - **ca-key.pem** – The Private Key
+  - **ca.csr** – The Certificate Signing Request
+
+  
