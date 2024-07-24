@@ -1074,3 +1074,97 @@ cfssl gencert \
 
 ![alt text](<11e  kubernetes admin user's Client Certificate and Private Key.png>)
 
+
+7. **Actually, we are not done yet!** 😫
+
+- There is one more pair of certificate and private key we need to generate. That is for the **Token Controller**: a part of the Kubernetes Controller Manager **kube-controller-manager** responsible for generating and signing service account tokens which are used by pods or other resources to establish connectivity to the ***api-server***. Read more about Service Accounts from the [official documentation](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/).
+
+- Alright, let us quickly create the last set of files, and we are done with PKIs
+
+```
+{
+
+cat > service-account-csr.json <<EOF
+{
+  "CN": "service-accounts",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "Kubernetes",
+      "OU": "lego-project",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  service-account-csr.json | cfssljson -bare service-account
+}
+```
+
+![alt text](<11f Token Controller - certificate and private key.png>)
+
+![alt text](<11g final ls command.png>)
+
+
+### Step 4 - Distributing the Client and Server Certificates
+
+- Now it is time to start sending all the client and server certificates to their respective instances.
+
+- Let us begin with the **worker nodes**:
+
+- Copy these files securely to the worker nodes using scp utility
+
+  - Root CA  certificate - **ca.pem**
+  - X509 Certificate for each worker node
+  - Private Key of the certificate for each worker node
+
+- scp for securely transfer files from one machine to another has the same format as ssh command
+
+```
+ssh -i <path to private key pair> <host machine username>@<host IP>
+
+scp -i <path to private key pair> file1 file2 file3 <host machine username>@<host IP>:~/;
+```
+
+- where ~/ is the choice directory where you want to send your files, in this case is the home directory
+
+```
+for i in 0 1 2; do
+  instance="${NAME}-worker-${i}"
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ${instance}-key.pem ${instance}.pem ubuntu@${external_ip}:~/; \
+done
+```
+
+- Output:
+
+```
+    ca.pem ${instance}-key.pem ${instance}.pem ubuntu@${external_ip}:~/; \
+done
+
+ca.pem                                                                                                                                                                             100% 1350    48.2KB/s   00:00    
+k8s-cluster-from-ground-up-worker-0-key.pem                                                                                                                                        100% 1675    52.5KB/s   00:00    
+k8s-cluster-from-ground-up-worker-0.pem                                                                                                                                            100% 1594    48.9KB/s   00:00    
+ca.pem                                                                                                                                                                             100% 1350    35.9KB/s   00:00    
+k8s-cluster-from-ground-up-worker-1-key.pem                                                                                                                                        100% 1675    41.6KB/s   00:00    
+k8s-cluster-from-ground-up-worker-1.pem                                                                                                                                            100% 1594    44.0KB/s   00:00    
+ca.pem                                                                                                                                                                             100% 1350    44.7KB/s   00:00    
+k8s-cluster-from-ground-up-worker-2-key.pem                                                                                                                                        100% 1679    49.2KB/s   00:00    
+k8s-cluster-from-ground-up-worker-2.pem 
+```
+
+![alt text](<12 Client n Server certificate(worker nodes).png>)
