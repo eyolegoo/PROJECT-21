@@ -1168,3 +1168,136 @@ k8s-cluster-from-ground-up-worker-2.pem
 ```
 
 ![alt text](<12 Client n Server certificate(worker nodes).png>)
+
+
+**Master or Controller node: – Note that only the api-server related files will be sent over to the master nodes.**
+
+```
+for i in 0 1 2; do
+instance="${NAME}-master-${i}" \
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ca-key.pem service-account-key.pem service-account.pem \
+    master-kubernetes.pem master-kubernetes-key.pem ubuntu@${external_ip}:~/;
+done
+```
+
+- Output:
+
+```
+ca.pem                                                                                                                                                                             100% 1350     8.4KB/s   00:00    
+ca-key.pem                                                                                                                                                                         100% 1675    44.7KB/s   00:00    
+service-account-key.pem                                                                                                                                                            100% 1675    45.3KB/s   00:00    
+service-account.pem                                                                                                                                                                100% 1440    42.0KB/s   00:00    
+master-kubernetes.pem                                                                                                                                                              100% 1956    58.5KB/s   00:00    
+master-kubernetes-key.pem                                                                                                                                                          100% 1671    47.5KB/s   00:00    
+ca.pem                                                                                                                                                                             100% 1350    42.9KB/s   00:00    
+ca-key.pem                                                                                                                                                                         100% 1675    46.3KB/s   00:00    
+service-account-key.pem                                                                                                                                                            100% 1675    44.1KB/s   00:00    
+service-account.pem                                                                                                                                                                100% 1440    46.9KB/s   00:00    
+master-kubernetes.pem                                                                                                                                                              100% 1956    54.6KB/s   00:00    
+master-kubernetes-key.pem                                                                                                                                                          100% 1671    48.7KB/s   00:00    
+ca.pem                                                                                                                                                                             100% 1350    41.8KB/s   00:00    
+ca-key.pem                                                                                                                                                                         100% 1675    45.4KB/s   00:00    
+service-account-key.pem                                                                                                                                                            100% 1675    52.5KB/s   00:00    
+service-account.pem                                                                                                                                                                100% 1440    45.6KB/s   00:00    
+master-kubernetes.pem                                                                                                                                                              100% 1956    48.9KB/s   00:00    
+master-kubernetes-key.pem
+```
+
+![alt text](<12a Client n Server certificate(master or controller nodes).png>)
+
+
+- The `kube-proxy`, `kube-controller-manager`, `kube-scheduler`, and `kubelet` client certificates will be used to generate client authentication configuration files later.
+
+### STEP 5 USE `KUBECTL` TO GENERATE KUBERNETES CONFIGURATION FILES FOR AUTHENTICATION
+
+- All the work you are doing right now is ensuring that you do not face any difficulties by the time the Kubernetes cluster is up and running. In this step, you will create some files known as `kubeconfig`, which enables Kubernetes clients to locate and authenticate to the Kubernetes API Servers.
+
+- You will need a client tool called `kubectl` to do this. And, by the way, most of your time with Kubernetes will be spent using `kubectl` commands.
+
+- Now it's time to generate kubeconfig files for the `kubelet`, `controller manager`, `kube-proxy`, and `scheduler` clients and then the `admin` user.
+
+- First, let us create a few environment variables for reuse by multiple commands.
+
+```
+KUBERNETES_API_SERVER_ADDRESS=$(aws elbv2 describe-load-balancers --load-balancer-arns ${LOAD_BALANCER_ARN} --output text --query 'LoadBalancers[].DNSName')
+```
+
+1. Generate the **kubelet** kubeconfig file
+
+- For each of the nodes running the kubelet component, it is very important that the client certificate configured for that node is used to generate the kubeconfig. This is because each certificate has the node's DNS name or IP Address configured at the time the certificate was generated. It will also ensure that the appropriate authorization is applied to that node through the [Node Authorizer](https://kubernetes.io/docs/reference/access-authn-authz/node/)
+
+- Below command must be run in the directory where all the certificates were generated.
+
+```
+for i in 0 1 2; do
+
+instance="${NAME}-worker-${i}"
+instance_hostname="ip-172-31-0-2${i}"
+
+ # Set the kubernetes cluster in the kubeconfig file
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://$KUBERNETES_API_SERVER_ADDRESS:6443 \
+    --kubeconfig=${instance}.kubeconfig
+
+# Set the cluster credentials in the kubeconfig file
+  kubectl config set-credentials system:node:${instance_hostname} \
+    --client-certificate=${instance}.pem \
+    --client-key=${instance}-key.pem \
+    --embed-certs=true \
+    --kubeconfig=${instance}.kubeconfig
+
+# Set the context in the kubeconfig file
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:node:${instance_hostname} \
+    --kubeconfig=${instance}.kubeconfig
+
+  kubectl config use-context default --kubeconfig=${instance}.kubeconfig
+done
+```
+
+- Output: 
+
+```
+Cluster "k8s-cluster-from-ground-up" set.
+
+User "system:node:ip-172-31-0-20.us-east-1.compute.internal" set.
+
+Context "default" created.
+
+Switched to context "default".
+
+Cluster "k8s-cluster-from-ground-up" set.
+
+User "system:node:ip-172-31-0-21.eu-central-1.compute.internal" set.
+
+Context "default" created.
+
+Switched to context "default".
+
+Cluster "k8s-cluster-from-ground-up" set.
+
+User "system:node:ip-172-31-0-22.us-east-1.compute.internal" set.
+
+Context "default" created.
+
+Switched to context "default".
+```
+
+- List the output `ls -ltr *.kubeconfig`
+
+- Output: 
+
+```
+-rw-------  1 dare  staff  6602 22 Jun 20:40 k8s-cluster-from-ground-up-worker-0.kubeconfig
+-rw-------  1 dare  staff  6602 22 Jun 20:40 k8s-cluster-from-ground-up-worker-1.kubeconfig
+-rw-------  1 dare  staff  6606 22 Jun 20:40 k8s-cluster-from-ground-up-worker-2.kubeconfig
+```
+
+![alt text](<13a Generate the kubelet kubeconfig file.png>)
