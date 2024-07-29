@@ -1301,3 +1301,14 @@ Switched to context "default".
 ```
 
 ![alt text](<13a Generate the kubelet kubeconfig file.png>)
+
+
+- Open up the kubeconfig files generated and review the 3 different sections that have been configured:
+
+  - Cluster
+  - Credentials
+  - And Kube Context
+
+- Kubeconfig file is used to organize information about clusters, users, namespaces and authentication mechanisms. By default, kubectl looks for a file named `config` in the `$HOME/.kube` directory. You can specify other kubeconfig files by setting the KUBECONFIG environment variable or by setting the `--kubeconfig` flag. To get to know more how to create your own kubeconfig files - read [this documentation](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
+
+- **Context** part of `kubeconfig` file defines three main parameters: cluster, namespace and user. You can save several different contexts with any convenient names and switch between them when needed.
