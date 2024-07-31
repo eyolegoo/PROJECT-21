@@ -1410,3 +1410,31 @@ kubectl config use-context %context-name%
 - In this lab you will generate a kubeconfig file for the kubectl command line utility based on the admin user credentials.
 
 - The Admin Kubernetes Configuration File: Each kubeconfig requires a Kubernetes API Server to connect to. To support high availability the IP address assigned to the external load balancer fronting the Kubernetes API Servers will be used.
+
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://${KUBERNETES_API_SERVER_ADDRESS}:6443 \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config set-credentials admin \
+    --client-certificate=admin.pem \
+    --client-key=admin-key.pem \
+    --embed-certs=true \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=admin \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config use-context default --kubeconfig=admin.kubeconfig
+}
+```
+
+![alt text](<13e Generate the kubeconfig file for the admin user.png>)
+
+
+- **TASK: Distribute the files to their respective servers, using `scp` and a for loop like we have done previously. This is a test to validate that you understand which component must go to which node.**
