@@ -1527,3 +1527,12 @@ done
 ```
 
 ![alt text](<15b Send the encryption file to the Controller nodes using scp and a for loop.png>)
+
+
+### Bootstrap etcd cluster
+
+- **TIPS**: Use a terminal multi-plexer like [multi-tabbed putty](https://www.youtube.com/watch?v=0c1cWrMnZlc) or [tmux](https://www.youtube.com/watch?v=Yl7NFenTgIo) to work with multiple terminal sessions simultaneously. It will make your life easier, especially when you need to work on multiple nodes and run the same command across all nodes. Imagine repeating the same commands on 10 different nodes, and you don not intend to start automating with a configuration management tool like Ansible yet.
+
+- The primary purpose of the ``etcd`` component is to store the state of the cluster. This is because Kubernetes itself is stateless. Therefore, all its stateful data will persist in ``etcd``. Since Kubernetes is a distributed system – it needs a distributed storage to keep persistent data in it. ``etcd`` is a highly-available key value store that fits the purpose. All K8s cluster configurations are stored in a form of key value pairs in ``etcd``, it also stores the **actual** and **desired** states of the cluster. ``etcd`` cluster is intelligent enough to watch for changes made on one instance and almost instantly replicate those changes to the rest of the instances, so all of them will be always reconciled.
+
+- **NOTE:** Do not just copy and paste the commands, ensure that you go through each and understand exactly what they will do on your servers. Use tools like `tmux` to make it easy to run commands on multiple terminal screens at once.
