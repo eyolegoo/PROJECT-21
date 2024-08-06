@@ -1473,3 +1473,57 @@ done
 - Kubernetes uses `etcd` [(A distributed key value store)](https://etcd.io/)to store variety of data which includes the cluster state, application configurations, and secrets. By default, the data that is being persisted to the disk is not encrypted. Any attacker that is able to gain access to this database can exploit the cluster since the data is stored in plain text. Hence, it is a security risk for Kubernetes that needs to be addressed.
 
 - To mitigate this risk, we must prepare to encrypt etcd at rest. "At rest" means data that is stored and persists on a disk. Anytime you hear "in-flight" or "in transit" refers to data that is being transferred over the network. "In-flight" encryption is done through TLS.
+
+**Generate the encryption key and encode it using base64**
+
+```
+ETCD_ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64) 
+```
+
+- See the output that will be generated when called. Yours will be a different random string.
+
+```
+echo $ETCD_ENCRYPTION_KEY
+```
+
+- **OUTPUT:**
+
+```
+7AP1slVwWLhdR6RrRPL28RRtpkDgtQR0a4vR89gmF0E=
+```
+
+**Create an encryption-config.yaml file as documented officially by kubernetes**
+
+```
+cat > encryption-config.yaml <<EOF
+kind: EncryptionConfig
+apiVersion: v1
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: ${ETCD_ENCRYPTION_KEY}
+      - identity: {}
+EOF
+```
+
+![alt text](<15a PREPARE THE ETCD DATABASE FOR ENCRYPTION AT REST..png>)
+
+
+- Send the encryption file to the Controller nodes using scp and a for loop.
+
+```
+for i in 0 1 2; do
+instance="${NAME}-master-${i}" \
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    encryption-config.yaml ubuntu@${external_ip}:~/;
+done
+```
+
+![alt text](<15b Send the encryption file to the Controller nodes using scp and a for loop.png>)
