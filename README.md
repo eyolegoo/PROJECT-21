@@ -1535,4 +1535,80 @@ done
 
 - The primary purpose of the ``etcd`` component is to store the state of the cluster. This is because Kubernetes itself is stateless. Therefore, all its stateful data will persist in ``etcd``. Since Kubernetes is a distributed system – it needs a distributed storage to keep persistent data in it. ``etcd`` is a highly-available key value store that fits the purpose. All K8s cluster configurations are stored in a form of key value pairs in ``etcd``, it also stores the **actual** and **desired** states of the cluster. ``etcd`` cluster is intelligent enough to watch for changes made on one instance and almost instantly replicate those changes to the rest of the instances, so all of them will be always reconciled.
 
-- **NOTE:** Do not just copy and paste the commands, ensure that you go through each and understand exactly what they will do on your servers. Use tools like `tmux` to make it easy to run commands on multiple terminal screens at once.
+- **NOTE:** Do not just copy and paste the commands, ensure that you go through each and understand exactly what they will do on your servers. Use tools like ``tmux`` to make it easy to run commands on multiple terminal screens at once.
+
+1. SSH into the controller server
+
+- Master-1
+
+```
+master_1_ip=$(aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=${NAME}-master-0" \
+--output text --query 'Reservations[].Instances[].PublicIpAddress')
+ssh -i k8s-cluster-from-ground-up.id_rsa ubuntu@${master_1_ip}
+```
+
+- Master-2
+
+```
+master_2_ip=$(aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=${NAME}-master-1" \
+--output text --query 'Reservations[].Instances[].PublicIpAddress')
+ssh -i k8s-cluster-from-ground-up.id_rsa ubuntu@${master_2_ip}
+```
+
+- Master-3
+
+```
+master_3_ip=$(aws ec2 describe-instances \
+--filters "Name=tag:Name,Values=${NAME}-master-2" \
+--output text --query 'Reservations[].Instances[].PublicIpAddress')
+ssh -i k8s-cluster-from-ground-up.id_rsa ubuntu@${master_3_ip}
+```
+
+![alt text](<16 ssh from my client workstation to my master nodes.png>) 
+
+
+2. Download and install etcd
+
+```
+wget -q --show-progress --https-only --timestamping \
+  "https://github.com/etcd-io/etcd/releases/download/v3.4.27/etcd-v3.4.27-linux-amd64.tar.gz"
+```
+
+3. Extract and install the etcd server and the etcdctl command line utility:
+
+```
+{
+tar -xvf etcd-v3.4.27-linux-amd64.tar.gz
+sudo mv etcd-v3.4.27-linux-amd64/etcd* /usr/local/bin/
+}
+```
+
+4. Configure the ``etcd`` server
+
+```
+{
+  sudo mkdir -p /etc/etcd /var/lib/etcd
+  sudo chmod 700 /var/lib/etcd
+  sudo cp ca.pem master-kubernetes-key.pem master-kubernetes.pem /etc/etcd/
+}
+```
+
+5. The instance internal IP address will be used to serve client requests and communicate with ``etcd`` cluster peers. Retrieve the internal IP address for the current compute instance:
+
+```
+export INTERNAL_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+```
+
+6. Each ``etcd`` member must have a unique name within an ``etcd`` cluster. Set the ``etcd`` name to node Private IP address so it will uniquely identify the machine:
+
+```
+ETCD_NAME=$(curl -s http://169.254.169.254/latest/user-data/ \
+  | tr "|" "\n" | grep "^name" | cut -d"=" -f2)
+
+echo ${ETCD_NAME}
+```
+
+![alt text](<17 configure the etcd server(etcd name).png>)
+
