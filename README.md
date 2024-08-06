@@ -1438,3 +1438,32 @@ kubectl config use-context %context-name%
 
 
 - **TASK: Distribute the files to their respective servers, using `scp` and a for loop like we have done previously. This is a test to validate that you understand which component must go to which node.**
+
+```
+for i in 0 1 2; do
+  instance="${NAME}-worker-${i}"
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    kube-proxy.kubeconfig ${instance}-key.pem ${instance}.pem ubuntu@${external_ip}:~/; \
+done
+```
+
+![alt text](<14a workers.png>)
+
+
+```
+for i in 0 1 2; do
+instance="${NAME}-master-${i}" \
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ca-key.pem service-account-key.pem service-account.pem \
+    kube-controller-manager.kubeconfig kube-scheduler.kubeconfig admin.kubeconfig ubuntu@${external_ip}:~/;
+done
+```
+
+![alt text](<14b master.png>)
+
