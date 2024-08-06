@@ -1492,7 +1492,7 @@ echo $ETCD_ENCRYPTION_KEY
 7AP1slVwWLhdR6RrRPL28RRtpkDgtQR0a4vR89gmF0E=
 ```
 
-**Create an encryption-config.yaml file as documented officially by kubernetes**
+**Create an `encryption-config.yaml` file as [documented officially by kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#understanding-the-encryption-at-rest-configuration)**
 
 ```
 cat > encryption-config.yaml <<EOF
