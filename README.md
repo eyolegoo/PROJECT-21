@@ -754,7 +754,7 @@ cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 }
 ```
 
-- Output
+- **OUTPUT**
 
 ```
 2021/05/16 20:18:44 [INFO] generating a new CA key and certificate from CSR
@@ -1150,7 +1150,7 @@ for i in 0 1 2; do
 done
 ```
 
-- Output:
+- **OUTPUT:**
 
 ```
     ca.pem ${instance}-key.pem ${instance}.pem ubuntu@${external_ip}:~/; \
@@ -1184,7 +1184,7 @@ instance="${NAME}-master-${i}" \
 done
 ```
 
-- Output:
+- **OUTPUT:**
 
 ```
 ca.pem                                                                                                                                                                             100% 1350     8.4KB/s   00:00    
@@ -1262,7 +1262,7 @@ instance_hostname="ip-172-31-0-2${i}"
 done
 ```
 
-- Output: 
+- **OUTPUT**: 
 
 ```
 Cluster "k8s-cluster-from-ground-up" set.
@@ -1292,7 +1292,7 @@ Switched to context "default".
 
 - List the output `ls -ltr *.kubeconfig`
 
-- Output: 
+- **OUTPUT**: 
 
 ```
 -rw-------  1 dare  staff  6602 22 Jun 20:40 k8s-cluster-from-ground-up-worker-0.kubeconfig
@@ -1952,3 +1952,52 @@ kubectl get namespaces --kubeconfig admin.kubeconfig
 
 ![alt text](<22e get the current namespaces.png>)
 
+
+ 3. To reach the Kubernetes API Server publicly
+
+```
+curl --cacert /var/lib/kubernetes/ca.pem https://$INTERNAL_IP:6443/version
+```
+
+- **OUTPUT**:
+
+![alt text](<22f To reach the Kubernetes API Server publicly.png>)
+
+
+ 4. To get the status of each component:
+
+```
+kubectl get componentstatuses --kubeconfig admin.kubeconfig
+```
+
+![alt text](<22g To get the status of each component.png>)
+
+![alt text](22gi.png)
+
+ 5. On one of the controller nodes, configure Role Based Access Control (RBAC) so that the api-server has necessary authorization for for the kubelet.
+
+ - Create the **ClusterRole**:
+
+```
+cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:kube-apiserver-to-kubelet
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/proxy
+      - nodes/stats
+      - nodes/log
+      - nodes/spec
+      - nodes/metrics
+    verbs:
+      - "*"
+EOF
+```
