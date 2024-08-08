@@ -454,7 +454,7 @@ aws ec2 create-route \
   --gateway-id ${INTERNET_GATEWAY_ID}
 ```
 
-- Output:
+- **OUTPUT**:
 
 ```
 {
@@ -1674,7 +1674,7 @@ sudo ETCDCTL_API=3 etcdctl member list \
   --key=/etc/etcd/master-kubernetes-key.pem
 ```
 
-- **Output**:
+- **OUTPUT**:
 
 ```
 6709c481b5234095, started, master-0, https://172.31.0.10:2380, https://172.31.0.10:2379, false
