@@ -1920,3 +1920,35 @@ sudo systemctl status kube-scheduler
 ```
 
 ![alt text](<22c Controller Services kubernetes scheduler.png>)
+
+
+- **NOTE**: There is a trap in the entire setup you have been going through, and so the `api-server` will not start up on your server if you have followed the exact steps so far. As a DevOps engineer, you must be able to solve problems.
+
+- **HINTS**:
+
+ 1. The problem relates to `etcd` configuration.
+ 2. Check the `systemd` logs for the `api-server`. The problem will be clearly logged, and it will give you an idea what is wrong. Find out how to fix it.
+
+- **TEST THAT EVERYTHING IS WORKING FINE**
+
+ 1. To get the cluster details run:
+
+```
+kubectl cluster-info  --kubeconfig admin.kubeconfig
+```
+
+- **OUTPUT**:
+
+![alt text](<22d To get the cluster details.png>)
+
+
+ 2. To get the current namespaces:
+
+```
+kubectl get namespaces --kubeconfig admin.kubeconfig
+```
+
+- **OUTPUT**:
+
+![alt text](<22e get the current namespaces.png>)
+
