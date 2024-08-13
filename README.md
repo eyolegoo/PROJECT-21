@@ -2295,3 +2295,69 @@ sudo mkdir -p \
 wget -q --show-progress --https-only --timestamping \
   https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz
 ```
+
+- **Install CNI into /opt/cni/bin/**
+
+```
+sudo tar -xvf cni-plugins-linux-amd64-v1.3.0.tgz -C /opt/cni/bin/
+```
+
+- The output shows the plugins that comes with the CNI.
+
+```
+./
+./macvlan
+./flannel
+./static
+./vlan
+./portmap
+./host-local
+./vrf
+./bridge
+./tuning
+./firewall
+./host-device
+./sbr
+./loopback
+./dhcp
+./ptp
+./ipvlan
+./bandwidth
+
+```
+
+- There are few other plugins that are not included in the CNI, which are also widely used in the industry. They all have their unique implementation approach and set of features.
+
+- Click to read more about each of the network plugins below:
+
+  - [Calico](https://www.tigera.io/project-calico/)
+  - [Weave Net](https://www.weave.works/docs/net/latest/overview/)
+  - [flannel](https://github.com/flannel-io/flannel)
+
+ [source](https://ranchermanager.docs.rancher.com/v2.5/faq/container-network-interface-providers)
+
+- Sometimes you can combine more than one plugin together to maximize the use of features from different providers. Or simply use a CNI network provider such as [canal](https://github.com/projectcalico/canal) that gives you the best of Flannel and Calico.
+
+7. Download binaries for `kubectl`, `kube-proxy`, and `kubelet`
+
+```
+wget -q --show-progress --https-only --timestamping \
+  https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-proxy \
+  https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubelet
+```
+
+8. Install the downloaded binaries
+
+```
+{
+  chmod +x  kubectl kube-proxy kubelet  
+  sudo mv  kubectl kube-proxy kubelet /usr/local/bin/
+}
+```
+
+**Configure the worker nodes components**
+
+9. **Configure** `kubelet`:
+
+- In the home directory, you should have the certificates and `kubeconfig` file for each node. A list in the home folder should look like below:
