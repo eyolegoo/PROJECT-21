@@ -2604,3 +2604,49 @@ sudo systemctl start containerd kubelet kube-proxy
 ```
 
 ![alt text](<28b sudo systemctl status kubelet.png>)
+
+
+- Now you should have the worker nodes joined to the cluster, and in a READY state.
+
+**Verification**
+
+- Login to one of the controller nodes:
+
+- List the registered Kubernetes nodes:
+
+```
+kubectl get nodes --kubeconfig admin.kubeconfig
+```
+
+![alt text](<29 kubectl get nodes --kubeconfig admin.kubeconfig on the controllers.png>)
+
+
+- From your local system, from the same directory used to generate the admin client certificates ca-authority or you can specify the absolute path of your admin.kubeconfig:
+
+```
+kubectl get nodes --kubeconfig admin.kubeconfig
+kubectl get componentstatuses --kubeconfig admin.kubeconfig
+kubectl cluster-info --kubeconfig admin.kubeconfig
+kubectl run nginx --image=nginx --kubeconfig admin.kubeconfig
+kubectl get po --kubeconfig admin.kubeconfig
+```
+
+![alt text](<30 final check on local workstation.png>)
+
+
+**Troubleshooting Tips:** If you have issues at this point. Consider the below:
+
+1. Use `journalctl -u <service name>` to get the log output and read what might be wrong with starting up the service. You can redirect the output into a file and analyse it.
+
+2. Review your PKI setup again. Ensure that the certificates you generated have the hostnames properly configured.
+
+3. It is okay to start all over again. Each time you attempt the solution is an opportunity to learn something.
+
+
+**Congratulations!**
+
+- I have created your first Kubernetes cluster From-Ground-Up! It was not an easy task, but I have learned how different components of K8s work together - it will help not just in creation of clusters in the real work experience, but will also help with sound skills to maintain and troubleshoot them further.
+
+- **Reference**
+
+[REFERENCE](https://petermd.github.io/kubernetes-the-hard-way/)
